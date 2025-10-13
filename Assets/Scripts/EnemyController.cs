@@ -40,7 +40,7 @@ public class EnemyController : MonoBehaviour
 
         if (isDead || isHurting || player == null)
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             return;
         }
 
@@ -51,7 +51,7 @@ public class EnemyController : MonoBehaviour
             anim.SetBool("isAttacking", true);
 
             Vector2 direction = (player.position - transform.position).normalized;
-            rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
+            rb.linearVelocity = new Vector2(direction.x * moveSpeed, rb.linearVelocity.y);
 
             if (direction.x > 0)
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
@@ -60,7 +60,7 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             anim.SetBool("isAttacking", false);
         }
     }
@@ -69,13 +69,17 @@ public class EnemyController : MonoBehaviour
     {
         if (isDead || isHurting) return;
 
+        intro?.ActualizarContadorGolpes(golpesRecibidos, golpesParaMorir);
+
+        ProgressionManager.Instance?.RegistrarGolpe();
+
         golpesRecibidos++;
         Debug.Log("Golpes recibidos: " + golpesRecibidos);
 
         if (golpesRecibidos >= golpesParaMorir)
         {
             isDead = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
 
             anim.SetBool("isAttacking", false);
             anim.ResetTrigger("isHurt");
@@ -98,7 +102,7 @@ public class EnemyController : MonoBehaviour
     {
         isHurting = true;
         anim.SetTrigger("isHurt");
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
 
         yield return new WaitForSeconds(0.5f);
 

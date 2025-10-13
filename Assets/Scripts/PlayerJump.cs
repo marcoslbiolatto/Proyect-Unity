@@ -57,7 +57,7 @@ public class PlayerJump : MonoBehaviour
                 challengeActive = false;
 
                 if (anim != null)
-                    anim.SetTrigger("Death");
+                    anim.SetTrigger("isDead");
 
                 FindObjectOfType<TutorialTextManager>().OnChallengeFail();
             }

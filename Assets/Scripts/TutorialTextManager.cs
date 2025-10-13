@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement; // ✅ Importar para cambiar de escena
 
 public class TutorialTextManager : MonoBehaviour
 {
@@ -46,6 +47,9 @@ public class TutorialTextManager : MonoBehaviour
         hudActive = false;
         instructionText.text = "¡Nivel superado!\nPresiona ESC para reintentar";
         playerHealth.StopDrain();
+
+        // ✅ Transición automática a Nivel1
+        SceneManager.LoadScene("Nivel1");
     }
 
     public void OnChallengeFail()
@@ -56,6 +60,6 @@ public class TutorialTextManager : MonoBehaviour
 
         Animator anim = playerJump.GetComponent<Animator>();
         if (anim != null)
-            anim.SetTrigger("Death");
+            anim.SetTrigger("isDead");
     }
 }

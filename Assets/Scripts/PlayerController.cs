@@ -12,10 +12,13 @@ public class PlayerController : MonoBehaviour
 
     public PlayerHealth playerHealth; // Asignar desde el Inspector
 
+    private Nivel1Intro intro; // Referencia al controlador de mensajes
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        intro = GameObject.FindObjectOfType<Nivel1Intro>(); // Inicializar referencia
     }
 
     void Update()
@@ -40,7 +43,6 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-
 
         if (!recibiendoDanio && !isDead)
         {
@@ -77,6 +79,11 @@ public class PlayerController : MonoBehaviour
                 isDead = true;
                 anim.SetTrigger("isDead");
                 rb.linearVelocity = Vector2.zero;
+
+                if (intro != null)
+                {
+                    intro.MostrarDerrota(); // Mostrar mensaje de derrota
+                }
             }
             else
             {
