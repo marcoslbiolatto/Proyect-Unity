@@ -19,6 +19,16 @@ public class EnemyController : MonoBehaviour
 
     private Nivel1Intro intro; // Referencia directa al controlador
 
+    // 🔹 Disparo: variables públicas
+    public GameObject prefabBolaDeFuego;
+    public Transform puntoDisparo;
+    public float frecuenciaDisparo = 1f;
+    public float velocidadProyectil = 5f;
+
+    // 🔹 Disparo: variables internas
+    private float tiempoEntreDisparos;
+    private float temporizadorDisparo;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -29,6 +39,9 @@ public class EnemyController : MonoBehaviour
             player = playerObj.transform;
 
         intro = GameObject.FindObjectOfType<Nivel1Intro>(); // Guardar referencia
+
+        // 🔹 Inicializar frecuencia de disparo
+        tiempoEntreDisparos = 1f / frecuenciaDisparo;
     }
 
     void Update()
@@ -40,7 +53,7 @@ public class EnemyController : MonoBehaviour
 
         if (isDead || isHurting || player == null)
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             return;
         }
 
@@ -51,16 +64,24 @@ public class EnemyController : MonoBehaviour
             anim.SetBool("isAttacking", true);
 
             Vector2 direction = (player.position - transform.position).normalized;
-            rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
+            rb.linearVelocity = new Vector2(direction.x * moveSpeed, rb.linearVelocity.y);
 
             if (direction.x > 0)
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
             else if (direction.x < 0)
                 transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
+
+            // 🔹 Disparo: controlar temporizador
+            temporizadorDisparo += Time.deltaTime;
+            if (temporizadorDisparo >= tiempoEntreDisparos)
+            {
+                Disparar();
+                temporizadorDisparo = 0f;
+            }
         }
         else
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             anim.SetBool("isAttacking", false);
         }
     }
@@ -69,13 +90,17 @@ public class EnemyController : MonoBehaviour
     {
         if (isDead || isHurting) return;
 
+        intro?.ActualizarContadorGolpes(golpesRecibidos, golpesParaMorir);
+
+        ProgressionManager.Instance?.RegistrarGolpe();
+
         golpesRecibidos++;
         Debug.Log("Golpes recibidos: " + golpesRecibidos);
 
         if (golpesRecibidos >= golpesParaMorir)
         {
             isDead = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
 
             anim.SetBool("isAttacking", false);
             anim.ResetTrigger("isHurt");
@@ -98,7 +123,7 @@ public class EnemyController : MonoBehaviour
     {
         isHurting = true;
         anim.SetTrigger("isHurt");
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
 
         yield return new WaitForSeconds(0.5f);
 
@@ -126,5 +151,16 @@ public class EnemyController : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
+
+    // 🔹 Método de disparo
+    void Disparar()
+    {
+        GameObject bola = Instantiate(prefabBolaDeFuego, puntoDisparo.position, Quaternion.identity);
+        BolaDeFuego script = bola.GetComponent<BolaDeFuego>();
+        if (script != null)
+        {
+            script.velocidad = velocidadProyectil;
+        }
     }
 }

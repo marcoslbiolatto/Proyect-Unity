@@ -23,7 +23,15 @@ public class PlayerAttack : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         currentStamina = maxStamina;
-        staminaBar.SetStamina(currentStamina, maxStamina);
+
+        if (staminaBar != null)
+        {
+            staminaBar.SetStamina(currentStamina, maxStamina);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ StaminaBar no asignada en esta escena. Se omite visual.");
+        }
     }
 
     void Update()
@@ -34,7 +42,11 @@ public class PlayerAttack : MonoBehaviour
         {
             anim.SetBool("isAttacking", true);
             currentStamina -= staminaCost;
-            staminaBar.SetStamina(currentStamina, maxStamina);
+
+            if (staminaBar != null)
+            {
+                staminaBar.SetStamina(currentStamina, maxStamina);
+            }
 
             if (regenCoroutine != null)
                 StopCoroutine(regenCoroutine);
@@ -66,7 +78,12 @@ public class PlayerAttack : MonoBehaviour
         {
             currentStamina += staminaRegenRate * Time.deltaTime;
             currentStamina = Mathf.Min(currentStamina, maxStamina);
-            staminaBar.SetStamina(currentStamina, maxStamina);
+
+            if (staminaBar != null)
+            {
+                staminaBar.SetStamina(currentStamina, maxStamina);
+            }
+
             yield return null;
         }
 

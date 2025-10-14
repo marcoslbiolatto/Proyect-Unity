@@ -1,27 +1,33 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
 using System.Collections;
 
 public class Nivel1Intro : MonoBehaviour
-
 {
-    private TMP_Text texto;
+    private TMP_Text texto; // TextoTutorialNivel1 para instrucciones y contador
     private GameObject player;
     private GameObject enemy;
+    private GameObject generadorCuras;
+
 
     void Start()
     {
-        Debug.Log("Nivel1Intro est· activo en escena.");
+        Debug.Log("Nivel1Intro est√° activo en escena.");
 
         texto = GameObject.Find("TextoTutorialNivel1")?.GetComponent<TMP_Text>();
         player = GameObject.Find("Player");
         enemy = GameObject.Find("Enemy");
+        generadorCuras = GameObject.Find("GeneradorCuras");
+        if (generadorCuras != null) generadorCuras.SetActive(false);
+
 
         if (texto == null || player == null || enemy == null)
         {
-            Debug.LogError("Faltan objetos. Verific· nombres: TextoTutorialNivel1, Player, Enemy.");
+            Debug.LogError("Faltan objetos. Verific√° nombres: TextoTutorialNivel1, Player, Enemy.");
             return;
         }
+
+        texto.gameObject.SetActive(true); // que est√© visible
 
         // Bloquear movimiento
         player.SetActive(false);
@@ -32,40 +38,41 @@ public class Nivel1Intro : MonoBehaviour
 
     IEnumerator MostrarInstrucciones()
     {
-        texto.gameObject.SetActive(true);
         texto.text = "En el nivel 1 ahora cuentas con la barra azul de stamina que sirve para golpear, con click izquierdo puedes atacar";
         yield return new WaitForSeconds(5f);
 
-        texto.text = "Debes derrotar al enemigo con 5 golpes para ganar, presiona Esc para reintentarlo";
+        texto.text = "Debes derrotar al enemigo con 5 golpes para ganar";
         yield return new WaitForSeconds(5f);
 
-        texto.gameObject.SetActive(false);
+        texto.text = ""; // Limpiar texto antes de mostrar contador
 
         // Activar movimiento
         player.SetActive(true);
         enemy.SetActive(true);
+        if (generadorCuras != null) generadorCuras.SetActive(true);
+
     }
 
     public void MostrarVictoria()
     {
-        if (texto == null)
-        {
-            Debug.LogError("Referencia a TMP_Text no est· asignada.");
-            return;
-        }
+        if (texto == null) return;
 
-        texto.gameObject.SetActive(true);
-        texto.enabled = true;
-        texto.text = "°Felicidades venciste a tu enemigo! NIVEL SUPERADO, presiona Esc para reintentar";
-
+        texto.text = "¬°Felicidades venciste a tu enemigo! NIVEL SUPERADO, presiona Esc para reintentar";
         Debug.Log("Texto de victoria mostrado correctamente.");
     }
 
-
-
     public void MostrarDerrota()
     {
-        texto.gameObject.SetActive(true);
-        texto.text = "Tu enemigo te derrotÛ. Presiona Esc para reintentar";
+        if (texto == null) return;
+
+        texto.text = "Tu enemigo te derrot√≥. Presiona Esc para reintentar";
+        Debug.Log("Texto de derrota mostrado correctamente.");
+    }
+
+    public void ActualizarContadorGolpes(int actuales, int maximos)
+    {
+        if (texto == null) return;
+
+        texto.text = "Golpes: " + actuales + " / " + maximos;
     }
 }
