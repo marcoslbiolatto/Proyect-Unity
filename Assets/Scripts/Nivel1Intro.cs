@@ -4,9 +4,11 @@ using System.Collections;
 
 public class Nivel1Intro : MonoBehaviour
 {
-    private TMP_Text texto; // Usamos TextoTutorialNivel1 para instrucciones y contador
+    private TMP_Text texto; // TextoTutorialNivel1 para instrucciones y contador
     private GameObject player;
     private GameObject enemy;
+    private GameObject generadorCuras;
+
 
     void Start()
     {
@@ -15,6 +17,9 @@ public class Nivel1Intro : MonoBehaviour
         texto = GameObject.Find("TextoTutorialNivel1")?.GetComponent<TMP_Text>();
         player = GameObject.Find("Player");
         enemy = GameObject.Find("Enemy");
+        generadorCuras = GameObject.Find("GeneradorCuras");
+        if (generadorCuras != null) generadorCuras.SetActive(false);
+
 
         if (texto == null || player == null || enemy == null)
         {
@@ -22,7 +27,7 @@ public class Nivel1Intro : MonoBehaviour
             return;
         }
 
-        texto.gameObject.SetActive(true); // Aseguramos que esté visible
+        texto.gameObject.SetActive(true); // que esté visible
 
         // Bloquear movimiento
         player.SetActive(false);
@@ -44,6 +49,8 @@ public class Nivel1Intro : MonoBehaviour
         // Activar movimiento
         player.SetActive(true);
         enemy.SetActive(true);
+        if (generadorCuras != null) generadorCuras.SetActive(true);
+
     }
 
     public void MostrarVictoria()

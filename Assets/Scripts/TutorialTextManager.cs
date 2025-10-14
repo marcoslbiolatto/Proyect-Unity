@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement; // ✅ Importar para cambiar de escena
+using UnityEngine.SceneManagement; //  Importar para cambiar de escena
 
 public class TutorialTextManager : MonoBehaviour
 {
@@ -9,6 +9,8 @@ public class TutorialTextManager : MonoBehaviour
     public PlayerJump playerJump;
 
     private bool hudActive = false;
+    private bool puedeAvanzar = false; // ← agregado
+    private bool desafioTerminado = false; // ← agregado
 
     void Start()
     {
@@ -36,20 +38,25 @@ public class TutorialTextManager : MonoBehaviour
 
     void Update()
     {
-        if (!hudActive || playerJump == null || instructionText == null) return;
+        if (desafioTerminado && Input.GetKeyDown(KeyCode.Q)) // ← solo si terminó el desafío
+        {
+            SceneManager.LoadScene("Nivel1");
+            return;
+        }
+
+        if (!hudActive || playerJump == null || instructionText == null || desafioTerminado) return;
 
         float timeRemaining = Mathf.Max(0f, playerJump.challengeTime - playerJump.ElapsedTime());
         instructionText.text = $"Saltos: {playerJump.jumpCount}/{playerJump.requiredJumps}\nTiempo: {timeRemaining:F1}s";
     }
 
+
     public void OnChallengeSuccess()
     {
         hudActive = false;
-        instructionText.text = "¡Nivel superado!\nPresiona ESC para reintentar";
+        desafioTerminado = true; // ← agregado
+        instructionText.text = "¡Nivel superado!\nPresiona Q para avanzar al siguiente nivel";
         playerHealth.StopDrain();
-
-        // ✅ Transición automática a Nivel1
-        SceneManager.LoadScene("Nivel1");
     }
 
     public void OnChallengeFail()
