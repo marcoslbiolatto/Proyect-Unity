@@ -72,12 +72,14 @@
     <Compile Include="Assets\Scripts\BolaDeFuego.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\StartInstruction.cs" />
+    <Compile Include="Assets\Scripts\MenuManager.cs" />
     <Compile Include="Assets\Scripts\Cura.cs" />
     <Compile Include="Assets\Scripts\HealthBarController.cs" />
     <Compile Include="Assets\Scripts\Nivel1Intro.cs" />
     <Compile Include="Assets\Scripts\ResetOnEscape.cs" />
     <Compile Include="Assets\Scripts\GeneradorProcedural.cs" />
     <Compile Include="Assets\Scripts\ProgressionManager.cs" />
+    <Compile Include="Assets\Scripts\MenuMusicPlayer.cs" />
     <Compile Include="Assets\Scripts\ProgresionData.cs" />
   </ItemGroup>
   <ItemGroup>
