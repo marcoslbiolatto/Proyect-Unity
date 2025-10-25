@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class Nivel1Intro : MonoBehaviour
 {
-    private TMP_Text texto; // TextoTutorialNivel1 para instrucciones y contador
+    private TMP_Text texto;
     private GameObject player;
     private GameObject enemy;
     private GameObject generadorCuras;
-
 
     void Start()
     {
@@ -20,16 +20,14 @@ public class Nivel1Intro : MonoBehaviour
         generadorCuras = GameObject.Find("GeneradorCuras");
         if (generadorCuras != null) generadorCuras.SetActive(false);
 
-
         if (texto == null || player == null || enemy == null)
         {
             Debug.LogError("Faltan objetos. Verificá nombres: TextoTutorialNivel1, Player, Enemy.");
             return;
         }
 
-        texto.gameObject.SetActive(true); // que esté visible
+        texto.gameObject.SetActive(true);
 
-        // Bloquear movimiento
         player.SetActive(false);
         enemy.SetActive(false);
 
@@ -38,26 +36,37 @@ public class Nivel1Intro : MonoBehaviour
 
     IEnumerator MostrarInstrucciones()
     {
-        texto.text = "En el nivel 1 ahora cuentas con la barra azul de stamina que sirve para golpear, con click izquierdo puedes atacar";
+        texto.text = "En el nivel 1 ahora cuentas con la barra azul de stamina que sirve para golpear. Con click izquierdo puedes atacar.";
         yield return new WaitForSeconds(5f);
 
-        texto.text = "Debes derrotar al enemigo con 5 golpes para ganar";
+        texto.text = "ten cuidado con la particulas que hacen danio.";
         yield return new WaitForSeconds(5f);
 
-        texto.text = ""; // Limpiar texto antes de mostrar contador
 
-        // Activar movimiento
+
+        texto.text = "Debes derrotar al enemigo con 5 golpes para ganar.";
+        yield return new WaitForSeconds(5f);
+
+        texto.text = "";
+
         player.SetActive(true);
         enemy.SetActive(true);
         if (generadorCuras != null) generadorCuras.SetActive(true);
+    }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Nivel1"); // Reinicia el nivel actual
+        }
     }
 
     public void MostrarVictoria()
     {
         if (texto == null) return;
 
-        texto.text = "¡Felicidades venciste a tu enemigo! NIVEL SUPERADO, presiona Esc para reintentar";
+        texto.text = "¡Felicidades, venciste a tu enemigo! Presiona Esc para volver a intentarlo.";
         Debug.Log("Texto de victoria mostrado correctamente.");
     }
 
@@ -65,7 +74,7 @@ public class Nivel1Intro : MonoBehaviour
     {
         if (texto == null) return;
 
-        texto.text = "Tu enemigo te derrotó. Presiona Esc para reintentar";
+        texto.text = "Tu enemigo te derrotó. Presiona Esc para reintentar.";
         Debug.Log("Texto de derrota mostrado correctamente.");
     }
 

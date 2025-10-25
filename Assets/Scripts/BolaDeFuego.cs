@@ -3,19 +3,19 @@ using UnityEngine;
 public class BolaDeFuego : MonoBehaviour
 {
     public float velocidad = 5f;
-    public float daño = 10f;
+    public float daÃ±o = 10f;
 
     void Start()
     {
         GameObject jugador = GameObject.FindGameObjectWithTag("Player");
-        Vector2 direccion = Vector2.left; // dirección por defecto
+        Vector2 direccion = Vector2.left; // direcciÃ³n por defecto
 
         if (jugador != null)
         {
             direccion = (jugador.transform.position - transform.position).normalized;
         }
 
-        GetComponent<Rigidbody2D>().velocity = direccion * velocidad;
+        GetComponent<Rigidbody2D>().linearVelocity = direccion * velocidad;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -26,7 +26,7 @@ public class BolaDeFuego : MonoBehaviour
             if (pc != null)
             {
                 Vector2 origen = transform.position;
-                pc.RecibeDanio(origen, (int)daño);
+                pc.RecibeDanio(origen, (int)daÃ±o);
             }
 
             Destroy(gameObject);

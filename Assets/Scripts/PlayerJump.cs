@@ -6,6 +6,9 @@ public class PlayerJump : MonoBehaviour
     public float jumpForce = 6f;
     public LayerMask groundLayer;
 
+    [SerializeField] private AudioClip sonidoSalto; // ✅ sonido asignable desde el Inspector
+    private AudioSource audioSource;
+
     private Rigidbody2D rb;
     private Animator anim;
     private bool isGrounded;
@@ -22,11 +25,11 @@ public class PlayerJump : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>(); // ✅ obtiene el AudioSource del objeto
     }
 
     void Update()
     {
-        // Detección combinada: velocidad vertical + contacto físico
         bool touchingGround = Physics2D.OverlapBox(transform.position, new Vector2(0.5f, 0.1f), 0f, groundLayer);
         bool lowVerticalSpeed = Mathf.Abs(rb.linearVelocity.y) < 0.01f;
         isGrounded = lowVerticalSpeed || touchingGround;
@@ -34,6 +37,10 @@ public class PlayerJump : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+
+            // ✅ reproducir sonido de salto
+            if (sonidoSalto != null && audioSource != null)
+                audioSource.PlayOneShot(sonidoSalto);
 
             if (challengeActive && !challengeEnded)
             {
@@ -63,7 +70,6 @@ public class PlayerJump : MonoBehaviour
             }
         }
 
-        // 🔁 Reinicio con ESC después de terminar
         if (challengeEnded && Input.GetKeyDown(KeyCode.Escape))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);

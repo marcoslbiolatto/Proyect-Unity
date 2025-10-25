@@ -3,8 +3,8 @@ using UnityEngine;
 public class HealthBarController : MonoBehaviour
 {
     public SpriteRenderer fillRenderer;
-    public float maxWidth = 1f;
-    public float maxHeight = 1f;
+    public float maxWidth = 2f;
+    public float maxHeight = 2f;
 
     public void SetHealth(float current, float max)
     {

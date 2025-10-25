@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
 
     private Nivel1Intro intro; // Referencia al controlador de mensajes
 
+    [SerializeField] private AudioSource audioSourceMuerte;
+    [SerializeField] private AudioClip sonidoMuerte;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -24,13 +27,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         anim.SetBool("RecibeDanio", recibiendoDanio);
+
         if (Input.GetKeyDown(KeyCode.Mouse0)) // ataque
         {
             anim.SetTrigger("isAttacking");
 
-            // Detectar al Enemy cerca
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 1f); // radio de ataque
-
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 1f);
             foreach (Collider2D hit in hits)
             {
                 if (hit.CompareTag("Enemy"))
@@ -46,9 +48,7 @@ public class PlayerController : MonoBehaviour
 
         if (!recibiendoDanio && !isDead)
         {
-            // Movimiento normal o lógica de ataque
-            // Asegurate de que el ataque se active solo si no está recibiendo daño
-            if (Input.GetKeyDown(KeyCode.Space)) // ejemplo de ataque
+            if (!UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.Equals("SampleScene") && Input.GetKeyDown(KeyCode.Space))
             {
                 anim.SetTrigger("isAttacking");
             }
@@ -80,9 +80,14 @@ public class PlayerController : MonoBehaviour
                 anim.SetTrigger("isDead");
                 rb.linearVelocity = Vector2.zero;
 
+                if (audioSourceMuerte != null && sonidoMuerte != null)
+                {
+                    audioSourceMuerte.PlayOneShot(sonidoMuerte);
+                }
+
                 if (intro != null)
                 {
-                    intro.MostrarDerrota(); // Mostrar mensaje de derrota
+                    intro.MostrarDerrota();
                 }
             }
             else
@@ -92,9 +97,41 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void RecibeDanioContinuo(Vector2 origenDelGolpe, int cantidadDanio)
+    {
+        if (isDead) return;
+
+        Debug.Log("Daño continuo recibido: " + cantidadDanio);
+
+        if (playerHealth != null)
+        {
+            playerHealth.currentHealth -= cantidadDanio;
+            playerHealth.currentHealth = Mathf.Clamp(playerHealth.currentHealth, 0f, playerHealth.maxHealth);
+            playerHealth.healthBar.SetHealth(playerHealth.currentHealth, playerHealth.maxHealth);
+
+            if (playerHealth.IsDead())
+            {
+                isDead = true;
+                anim.SetTrigger("isDead");
+                rb.linearVelocity = Vector2.zero;
+
+                if (audioSourceMuerte != null && sonidoMuerte != null)
+                {
+                    audioSourceMuerte.PlayOneShot(sonidoMuerte);
+                }
+
+                if (intro != null)
+                {
+                    intro.MostrarDerrota();
+                }
+            }
+        }
+    }
+
+
     IEnumerator ResetDanio()
     {
-        yield return new WaitForSeconds(0.5f); // duración de la animación de Hurt
+        yield return new WaitForSeconds(0.5f);
         DesactivaDanio();
     }
 

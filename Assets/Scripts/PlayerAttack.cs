@@ -19,6 +19,10 @@ public class PlayerAttack : MonoBehaviour
 
     private Coroutine regenCoroutine;
 
+    [SerializeField] private AudioSource audioSourceGolpe;
+    [SerializeField] private AudioClip sonidoGolpe;
+
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -41,6 +45,11 @@ public class PlayerAttack : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canAttack)
         {
             anim.SetBool("isAttacking", true);
+            if (audioSourceGolpe != null && sonidoGolpe != null)
+            {
+                audioSourceGolpe.PlayOneShot(sonidoGolpe);
+            }
+
             currentStamina -= staminaCost;
 
             if (staminaBar != null)
