@@ -11,6 +11,7 @@ public class TutorialTextManager : MonoBehaviour
     private bool hudActive = false;
     private bool puedeAvanzar = false; // ← agregado
     private bool desafioTerminado = false; // ← agregado
+   [SerializeField] private AudioClip sonidoMuerte;
 
     void Start()
     {
@@ -68,5 +69,12 @@ public class TutorialTextManager : MonoBehaviour
         Animator anim = playerJump.GetComponent<Animator>();
         if (anim != null)
             anim.SetTrigger("isDead");
+
+        AudioSource audio = playerJump.GetComponent<AudioSource>();
+        if (audio != null && sonidoMuerte != null)
+        {
+            audio.PlayOneShot(sonidoMuerte);
+        }
+
     }
 }

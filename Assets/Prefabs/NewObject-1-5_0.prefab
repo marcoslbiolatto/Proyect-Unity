@@ -175,4 +175,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626eedda6002b0949b90b4afbf26bf56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cantidadCura: 5
+  particulasCura: {fileID: 0}
+  cantidadCura: 20

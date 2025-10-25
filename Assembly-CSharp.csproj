@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\TutorialTextManager.cs" />
+    <Compile Include="Assets\Scripts\ZonaDeDanio.cs" />
     <Compile Include="Assets\Scripts\EnemyController.cs" />
     <Compile Include="Assets\Scripts\StaminaBarController.cs" />
     <Compile Include="Assets\Scripts\PlayerAttack.cs" />

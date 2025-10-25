@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class EnemyController : MonoBehaviour
 {
     public float moveSpeed = 2f;
-    public float detectionRadius = 0.5f;
+    public float detectionRadius = 2.5f;
     public LayerMask playerLayer;
 
     [SerializeField] private int golpesRecibidos = 0;
@@ -17,61 +18,91 @@ public class EnemyController : MonoBehaviour
     private Transform player;
     private Animator anim;
 
-    private Nivel1Intro intro; // Referencia directa al controlador
+    private Nivel1Intro intro;
 
-    // 🔹 Disparo: variables públicas
     public GameObject prefabBolaDeFuego;
     public Transform puntoDisparo;
     public float frecuenciaDisparo = 1f;
     public float velocidadProyectil = 5f;
 
-    // 🔹 Disparo: variables internas
     private float tiempoEntreDisparos;
     private float temporizadorDisparo;
+
+    private static int enemigosGenerados = 0;
+    public int cantidadMaxima = 5;
+    public float intervaloGeneracion = 5f;
+
+    public void AsignarJugador(Transform jugador)
+    {
+        player = jugador;
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
 
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-            player = playerObj.transform;
+        // No buscar al jugador en Start si puede estar desactivado
+        intro = GameObject.FindObjectOfType<Nivel1Intro>();
 
-        intro = GameObject.FindObjectOfType<Nivel1Intro>(); // Guardar referencia
-
-        // 🔹 Inicializar frecuencia de disparo
         tiempoEntreDisparos = 1f / frecuenciaDisparo;
+
+        if (SceneManager.GetActiveScene().name == "Nivel2")
+        {
+            InvokeRepeating("GenerarOtroEnemigo", 2f, intervaloGeneracion);
+        }
+        else
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+                player = playerObj.transform;
+        }
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        // 🔁 Buscar al jugador si aún no fue asignado
+        if (player == null)
         {
-            anim.SetTrigger("isHurt");
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+                Debug.Log("✔ Player asignado dinámicamente");
+            }
+            else
+            {
+                rb.linearVelocity = Vector2.zero;
+                return;
+            }
         }
 
-        if (isDead || isHurting || player == null)
+        if (isDead || isHurting)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        // 🔍 Calcular dirección hacia el jugador
+        Vector2 direccion = (player.position - transform.position).normalized;
+        float distancia = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer < detectionRadius)
+        Debug.Log("Distancia al jugador: " + distancia);
+        Debug.Log("Dirección hacia el jugador: " + direccion);
+
+        // ✅ Si está dentro del radio de detección, moverse y atacar
+        if (distancia < detectionRadius)
         {
             anim.SetBool("isAttacking", true);
+            rb.linearVelocity = new Vector2(direccion.x * moveSpeed, rb.linearVelocity.y);
 
-            Vector2 direction = (player.position - transform.position).normalized;
-            rb.linearVelocity = new Vector2(direction.x * moveSpeed, rb.linearVelocity.y);
-
-            if (direction.x > 0)
+            // Orientación visual
+            if (direccion.x > 0)
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-            else if (direction.x < 0)
+            else if (direccion.x < 0)
                 transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
 
-            // 🔹 Disparo: controlar temporizador
+            // Disparo
             temporizadorDisparo += Time.deltaTime;
             if (temporizadorDisparo >= tiempoEntreDisparos)
             {
@@ -86,12 +117,12 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+
     public void RecibeGolpe()
     {
         if (isDead || isHurting) return;
 
         intro?.ActualizarContadorGolpes(golpesRecibidos, golpesParaMorir);
-
         ProgressionManager.Instance?.RegistrarGolpe();
 
         golpesRecibidos++;
@@ -108,10 +139,7 @@ public class EnemyController : MonoBehaviour
 
             Debug.Log("Enemy ha muerto");
 
-            if (intro != null)
-            {
-                intro.MostrarVictoria();
-            }
+            intro?.MostrarVictoria();
         }
         else
         {
@@ -153,7 +181,6 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 
-    // 🔹 Método de disparo
     void Disparar()
     {
         GameObject bola = Instantiate(prefabBolaDeFuego, puntoDisparo.position, Quaternion.identity);
@@ -162,5 +189,13 @@ public class EnemyController : MonoBehaviour
         {
             script.velocidad = velocidadProyectil;
         }
+    }
+
+    void GenerarOtroEnemigo()
+    {
+        if (enemigosGenerados >= cantidadMaxima) return;
+
+        Instantiate(gameObject, transform.position + Vector3.right * 2f, Quaternion.identity);
+        enemigosGenerados++;
     }
 }
